@@ -155,7 +155,7 @@ class TestConsole(unittest.TestCase):
                 "** value missing **\n", f.getvalue())
 
     def test_z_all(self):
-        """Test alternate all command inpout"""
+        """Test alternate all command"""
         with patch('sys.stdout', new=StringIO()) as f:
             self.consol.onecmd("asdfsdfsd.all()")
             self.assertEqual(
@@ -165,7 +165,7 @@ class TestConsole(unittest.TestCase):
             self.assertEqual("[]\n", f.getvalue())
 
     def test_z_count(self):
-        """Test count command inpout"""
+        """Test count command"""
         with patch('sys.stdout', new=StringIO()) as f:
             self.consol.onecmd("asdfsdfsd.count()")
             self.assertEqual(
@@ -175,7 +175,7 @@ class TestConsole(unittest.TestCase):
             self.assertEqual("0\n", f.getvalue())
 
     def test_z_show(self):
-        """Test alternate show command inpout"""
+        """Test alternate show command"""
         with patch('sys.stdout', new=StringIO()) as f:
             self.consol.onecmd("safdsa.show()")
             self.assertEqual(
@@ -218,6 +218,7 @@ class TestConsole(unittest.TestCase):
             self.consol.onecmd("User.update(" + my_id + ", name)")
             # self.assertEqual(
             #    "** value missing **\n", f.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()
