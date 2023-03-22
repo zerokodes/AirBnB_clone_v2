@@ -64,5 +64,7 @@ class FileStorage:
 
     def delete(self, obj=None):
         """delete obj from __objects if pressent"""
-        key = "{}.{}".format(type(obj).__name__, obj.id)
-        del self.__objects[key]
+        try:
+            del self.__objects["{}.{}".format(type(obj).__name__, obj.id)]
+        except (AttributeError, KeyError):
+            pass
