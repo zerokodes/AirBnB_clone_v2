@@ -32,11 +32,6 @@ class BaseModel:
                 if key != "__class__":
                     setattr(self, key, value)
 
-    def __str__(self):
-        """Returns a string representation of the instance"""
-        cls = (str(type(self)).split('.')[-1]).split('\'')[0]
-        return '[{}] ({}) {}'.format(cls, self.id, self.__dict__)
-
     def save(self):
         """Updates updated_at with current time when instance is changed"""
         self.updated_at = datetime.utcnow()
@@ -55,3 +50,9 @@ class BaseModel:
         my_dict['updated_at'] = self.updated_at.isoformat()
         my_dict.pop("_sa_instance_state", None)
         return my_dict
+
+    def __str__(self):
+        """ Return the str representation of the BaseModel Instance"""
+        d = self.__dict__.copy()
+        d.pop("_sa_instance_state", None)
+        return "[{}] ({}) {}".format(type(self).__name__, self.id, d)
