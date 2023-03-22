@@ -20,13 +20,9 @@ class HBNBCommand(cmd.Cmd):
     prompt = "(hbnb) "
 
     __classes = {
-               'BaseModel',
-               'User',
-               'Place',
-               'State',
-               'City',
-               'Amenity',
-               'Review'
+               'BaseModel': BaseModel, 'User': User, 'Place': Place,
+               'State': State, 'City': City, 'Amenity': Amenity,
+               'Review': Review
               }
 
     def count(self, line):
@@ -115,25 +111,25 @@ class HBNBCommand(cmd.Cmd):
                 raise SyntaxError()
             my_list = line.split(" ")
 
-            kwargs = {}
-            for pair in range(1, len(my_list)):
-                key, value = tuple(my_list[i].split("="))
-                if value[0] == '"':
-                    value = value.strip('"'), replace("_", " ")
-                else:
-                    try:
-                        value = eval(value)
-                    except (SyntaxError, NameError):
-                        continue
-                kwargs[key] = value
-
-            if kwargs == {}:
-                obj = eval(my_list[0])()
+            if my_list:
+                cls_name = my_list[0]
             else:
-                obj = eval(my_list[0])(**kwargs)
-                storage.new(obj)
-                print(obj.id)
-                obj.save()
+                raise SyntaxError()
+            kwargs = {}
+            for pair in my_list[1:]:
+                key, value = pair.split("=")
+                if self.is_int(value):
+                    kwargs[key] = int(value)
+                elif self.is_float(value):
+                    kwargs[key] = float(value)
+                else:
+                    value = value.replace('_', ' ')
+                    kwargs[key] = value.strip('"\'')
+
+            obj = self.__classes[cls_name](**kwargs)
+            storage.new(obj)
+            obj.save()
+            print(obj.id)
 
         except SyntaxError:
             print("** class name missing **")
@@ -204,22 +200,23 @@ class HBNBCommand(cmd.Cmd):
             print("** no instance found **")
 
     def do_all(self, line):
-        """ Shows string representations of all instances
-            of a given class. If no class specified display all
-            instatiated objects.
-        """
+        """ Shows all objects, or all objects of a class"""
+        objects = storage.all()
+        my_list = []
         if not line:
-            ob = storage.all()
-            print([ob[k].__str__() for k in ob])
+            for key in objects:
+                my_list.append(objects[key])
+            print(my_list)
             return
         try:
             args = line.split(" ")
             if args[0] not in self.__classes:
                 raise NameError()
-
-            ob = storage.all(args[0])
-            print([ob[k].__str__() for k in ob])
-
+            for key in objects:
+                name = key.split('.')
+                if name[0] == args[0]:
+                    my_list.append(objects[key])
+            print(my_list)
         except NameError:
             print("** class doesn't exist **")
 
@@ -259,6 +256,23 @@ class HBNBCommand(cmd.Cmd):
             print("** attribute name missing**")
         except ValueError:
             print("** value missing**")
+
+    @staticmethod
+    def is_int(n):
+        """ checks if int"""
+        try:
+            int(n)
+            return True
+        except ValueError:
+            return False
+
+    @staticmethod
+    def is_float(n):
+        try:
+            float(n)
+            return True
+        except ValueError:
+            return False
 
 
 if __name__ == "__main__":
