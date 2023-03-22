@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 """ """
-from models.base_model import BaseModel
 import unittest
-import datetime
-from uuid import UUID
-import json
+from datetime import datetime
+from models.base_model import BaseModel
+import pep8
 import os
+from models.engine.file_storage import FileStorage
 
 
 class test_basemodel(unittest.TestCase):
@@ -14,9 +14,13 @@ class test_basemodel(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """setup for the test """
+        try:
+            os.rename("file.json", "temp")
+        except IOError:
+            pass
+        FileStorage._FileStorage__objects = {}
+        cls.storage = FileStorage()
         cls.base = BaseModel()
-        cls.base.name = "Sepi"
-        cls.base.num = 20
 
     @classmethod
     def tearDown(cls):
@@ -30,8 +34,11 @@ class test_basemodel(unittest.TestCase):
         except Exception:
             pass
 
-    @unittest.skipIf(os.environ['HBNB_TYPE_STORAGE'] == 'db', 'Test storage')
+    @unittest.skipIf(os.getenv('HBNB_ENV') is not None, 'Test DBStorage')
     def test_save(self):
         """ Test if the save works"""
+        old = self.base.updated_at()
         self.base.save()
-        self.assertNotEqual(self.base.created_at, self.base.updated_at)
+        self.assertLess(old, self.base.updated_at)
+        with open("file.json", "r") as f:
+            self.assertIn("BaseModel.{}".format(self.base.id), f.read())
