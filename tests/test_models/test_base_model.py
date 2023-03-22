@@ -34,10 +34,10 @@ class test_basemodel(unittest.TestCase):
         except Exception:
             pass
 
-    @unittest.skipIf(os.getenv('HBNB_ENV') is not None, 'Test DBStorage')
+    @unittest.skipIf(os.getenv("HBNB_ENV") is not None, "Testing DBStorage")
     def test_save(self):
         """ Test if the save works"""
-        old = self.base.updated_at()
+        old = self.base.updated_at
         self.base.save()
         self.assertLess(old, self.base.updated_at)
         with open("file.json", "r") as f:
